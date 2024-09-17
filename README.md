@@ -1,2 +1,2 @@
 # jotai-mutative
-Jotai integration library for Mutative
+A Mutative extension for Jotai
