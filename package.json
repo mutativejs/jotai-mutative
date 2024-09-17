@@ -1,6 +1,6 @@
 {
   "name": "jotai-mutative",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A Mutative extension for Jotai",
   "main": "dist/index.cjs.js",
   "unpkg": "dist/index.umd.js",
