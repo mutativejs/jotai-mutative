@@ -111,7 +111,9 @@ const Controls = () => {
 
 ## Credits
 
-`jotai-mutative` is inspired by `jotai-immer`. It uses the same API as `jotai-immer` but uses Mutative under the hood. The repository is based on the `jotai-immer` repository.
+`jotai-mutative` is inspired by `jotai-immer`.
+
+It uses the same API as `jotai-immer` but uses Mutative under the hood. The repository is based on the `jotai-immer` repository.
 
 ## License
 

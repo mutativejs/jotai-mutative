@@ -29,7 +29,7 @@ test('withMutative derived atom with useAtom', async () => {
   const { findByText, getByText } = render(
     <StrictMode>
       <Parent />
-    </StrictMode>,
+    </StrictMode>
   );
 
   await findByText('count: 0');
@@ -58,7 +58,7 @@ test('withMutative derived atom with WritableAtom<Value, [Value]> signature', as
   const { findByText, getByText } = render(
     <StrictMode>
       <Parent />
-    </StrictMode>,
+    </StrictMode>
   );
 
   await findByText('count: 0');
@@ -90,7 +90,7 @@ test('withMutative derived atom with WritableAtom<Value, [Value | OtherValue]> s
   const { findByText, getByText } = render(
     <StrictMode>
       <Parent />
-    </StrictMode>,
+    </StrictMode>
   );
 
   await findByText('count: 0');

@@ -8,21 +8,21 @@ type Options = Parameters<typeof useSetAtom>[1];
 
 export function useSetMutativeAtom<Value, Result>(
   anAtom: WritableAtom<Value, [(draft: Draft<Value>) => void], Result>,
-  options?: Options,
+  options?: Options
 ): (fn: (draft: Draft<Value>) => void) => Result;
 
 export function useSetMutativeAtom<Value, Result>(
   anAtom: WritableAtom<Value, [(value: Value) => Value], Result>,
-  options?: Options,
+  options?: Options
 ): (fn: (draft: Draft<Value>) => void) => Result;
 
 export function useSetMutativeAtom<Value, Result>(
   anAtom: WritableAtom<Value, [(value: Value) => Value], Result>,
-  options?: Options,
+  options?: Options
 ) {
   const setState = useSetAtom(anAtom, options);
   return useCallback(
     (fn: (draft: Draft<Value>) => void) => setState(create(fn)),
-    [setState],
+    [setState]
   );
 }
