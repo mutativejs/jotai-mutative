@@ -1,10 +1,11 @@
-import { create } from 'mutative';
-import type { Draft } from 'mutative';
+import { create, type Draft } from 'mutative';
 import { atom } from 'jotai/vanilla';
 import type { WritableAtom } from 'jotai/vanilla';
+import type { MutativeOptions } from './interface';
 
-export function atomWithMutative<Value>(
-  initialValue: Value
+export function atomWithMutative<Value, F extends boolean = false>(
+  initialValue: Value,
+  options?: MutativeOptions<false, F>
 ): WritableAtom<Value, [Value | ((draft: Draft<Value>) => void)], void> {
   const anAtom: WritableAtom<
     Value,
@@ -19,8 +20,9 @@ export function atomWithMutative<Value>(
           get(anAtom),
           typeof fn === 'function'
             ? (fn as (draft: Draft<Value>) => void)
-            : () => fn
-        )
+            : () => fn,
+          options
+        ) as Value
       )
   );
   return anAtom;

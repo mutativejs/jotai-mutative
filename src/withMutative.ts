@@ -1,13 +1,20 @@
 import { create, type Draft } from 'mutative';
 import { atom } from 'jotai/vanilla';
 import type { PrimitiveAtom, WritableAtom } from 'jotai/vanilla';
+import type { MutativeOptions } from './interface';
 
 const cache1 = new WeakMap();
-const memo1 = <T>(create: () => T, dep1: object): T =>
-  (cache1.has(dep1) ? cache1 : cache1.set(dep1, create())).get(dep1);
+const memo1 = <T>(create1: () => T, dep1: object): T =>
+  (cache1.has(dep1) ? cache1 : cache1.set(dep1, create1())).get(dep1);
 
-export function withMutative<Value, Args extends unknown[], Result>(
-  anAtom: WritableAtom<Value, Args, Result>
+export function withMutative<
+  Value,
+  Args extends unknown[],
+  Result,
+  F extends boolean = false
+>(
+  anAtom: WritableAtom<Value, Args, Result>,
+  options?: MutativeOptions<false, F>
 ): WritableAtom<
   Value,
   Args extends [Value | infer OtherValue]
@@ -20,12 +27,14 @@ export function withMutative<Value, Args extends unknown[], Result>(
   Result
 >;
 
-export function withMutative<Value>(
-  anAtom: PrimitiveAtom<Value>
+export function withMutative<Value, F extends boolean = false>(
+  anAtom: PrimitiveAtom<Value>,
+  options?: MutativeOptions<false, F>
 ): WritableAtom<Value, [Value | ((draft: Draft<Value>) => void)], void>;
 
-export function withMutative<Value, Result>(
-  anAtom: WritableAtom<Value, [Value], Result>
+export function withMutative<Value, Result, F extends boolean = false>(
+  anAtom: WritableAtom<Value, [Value], Result>,
+  options?: MutativeOptions<false, F>
 ) {
   return memo1(() => {
     const derivedAtom = atom(
@@ -37,8 +46,9 @@ export function withMutative<Value, Result>(
             get(anAtom),
             typeof fn === 'function'
               ? (fn as (draft: Draft<Value>) => void)
-              : () => fn
-          )
+              : () => fn,
+            options
+          ) as Value
         )
     );
     return derivedAtom;
