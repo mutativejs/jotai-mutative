@@ -29,7 +29,7 @@ test('useSetMutativeAtom with regular atom', async () => {
   const { findByText, getByText } = render(
     <StrictMode>
       <Parent />
-    </StrictMode>,
+    </StrictMode>
   );
 
   await findByText('count: 0');
@@ -63,7 +63,7 @@ test('useSetMutativeAtom with mutative atom', async () => {
   const { findByText, getByText } = render(
     <StrictMode>
       <Parent />
-    </StrictMode>,
+    </StrictMode>
   );
 
   await findByText('count: 0');
@@ -98,7 +98,7 @@ test('useSetMutativeAtom with derived mutative atom', async () => {
   const { findByText, getByText } = render(
     <StrictMode>
       <Parent />
-    </StrictMode>,
+    </StrictMode>
   );
 
   await findByText('count: 0');
