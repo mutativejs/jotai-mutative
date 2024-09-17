@@ -93,7 +93,7 @@
   "peerDependencies": {
     "@types/react": "^18.0 || ^17.0",
     "jotai": "^2.0",
-    "mutative": "^1.0.8",
+    "mutative": "^1.0",
     "react": "^18.0 || ^17.0"
   }
 }
