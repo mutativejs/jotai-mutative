@@ -114,7 +114,7 @@ test('useMutativeAtom with derived mutative atom', async () => {
   await findByText('count: 0');
 });
 
-test('useMutativeAtom changes the draft of a mutative atom in place', () => {
+test('useMutativeAtom passes the recipe to a mutative atom', () => {
   const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
   const store = createStore();
   const stateAtom = atomWithMutative({ count: 0, list: [{ id: 1 }] });

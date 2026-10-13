@@ -1,8 +1,9 @@
 import { useCallback, useRef } from 'react';
-import { create, isDraft, type Draft } from 'mutative';
+import { create, type Draft } from 'mutative';
 import { useSetAtom } from 'jotai/react';
 import type { WritableAtom } from 'jotai/vanilla';
 import type { MutativeOptions } from './interface';
+import { mutativeAtoms } from './mutativeAtoms';
 
 type Options = Parameters<typeof useSetAtom>[1];
 
@@ -29,18 +30,15 @@ export function useSetMutativeAtom<Value, Result, F extends boolean = false>(
   const mutativeOptionsRef = useRef(mutativeOptions);
   mutativeOptionsRef.current = mutativeOptions;
   return useCallback(
-    (fn: (draft: Draft<Value>) => void) =>
-      setState(
-        // The write function of an atom from atomWithMutative() or
-        // withMutative() passes a draft, which the recipe changes in place:
-        // create() would draft a copy of it, current(draft), and warn.
-        ((value: Value) =>
-          isDraft(value)
-            ? fn(value as Draft<Value>)
-            : create(value, fn, mutativeOptionsRef.current)) as (
-          value: Value
-        ) => Value
-      ),
-    [setState]
+    (fn: (draft: Draft<Value>) => void) => {
+      const mutativeOptions = mutativeOptionsRef.current;
+      // The atoms of atomWithMutative() and withMutative() apply the recipe
+      // themselves. Other atoms, or options of the hook, need its create(),
+      // which then gives the next value to the write function of the atom.
+      return mutativeOptions === undefined && mutativeAtoms.has(anAtom)
+        ? setState(fn as unknown as (value: Value) => Value)
+        : setState(create(fn, mutativeOptions) as (value: Value) => Value);
+    },
+    [setState, anAtom]
   );
 }

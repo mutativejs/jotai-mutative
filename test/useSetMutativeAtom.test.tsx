@@ -10,6 +10,7 @@ import {
 } from '@testing-library/react';
 import { Provider, useAtomValue } from 'jotai/react';
 import { atom, createStore } from 'jotai/vanilla';
+import { create } from 'mutative';
 import { atomWithMutative, useSetMutativeAtom, withMutative } from '../src';
 
 afterEach(cleanup);
@@ -123,7 +124,7 @@ describe('useSetMutativeAtom with an object state', () => {
     ({ children }: { children: ReactNode }) =>
       <Provider store={store}>{children}</Provider>;
 
-  test('changes the draft of a mutative atom in place', () => {
+  test('passes the recipe to a mutative atom', () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
     const store = createStore();
     const stateAtom = atomWithMutative({ count: 0, list: [{ id: 1 }] });
@@ -144,7 +145,7 @@ describe('useSetMutativeAtom with an object state', () => {
     warn.mockRestore();
   });
 
-  test('changes the draft of a derived mutative atom in place', () => {
+  test('passes the recipe to a derived mutative atom', () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
     const store = createStore();
     const stateAtom = withMutative(atom({ count: 0, list: [{ id: 1 }] }));
@@ -202,6 +203,67 @@ describe('useSetMutativeAtom with an object state', () => {
 
     expect(store.get(stateAtom)).toEqual({ count: 1 });
     expect(Object.isFrozen(store.get(stateAtom))).toBe(true);
+  });
+
+  test('applies its mutative options to a mutative atom', () => {
+    // Mutative warns that create() received a draft of the atom.
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = createStore();
+    const stateAtom = atomWithMutative({ count: 0 });
+    const { result } = renderHook(
+      () =>
+        useSetMutativeAtom(stateAtom, undefined, { enableAutoFreeze: true }),
+      { wrapper: withStore(store) }
+    );
+
+    act(() =>
+      result.current((draft) => {
+        draft.count += 1;
+      })
+    );
+
+    expect(store.get(stateAtom)).toEqual({ count: 1 });
+    expect(Object.isFrozen(store.get(stateAtom))).toBe(true);
+    warn.mockRestore();
+  });
+
+  test('gives the next value to atoms that pass it a draft', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = createStore();
+    const baseAtom = atomWithMutative({ items: [1], other: 1 });
+    const spreadAtom = atom(
+      (get) => get(baseAtom).items,
+      (_get, set, update: (items: number[]) => number[]) =>
+        set(baseAtom, (draft) => ({ ...draft, items: update(draft.items) }))
+    );
+    const assignAtom = atom(
+      (get) => get(baseAtom).items,
+      (get, set, update: (items: number[]) => number[]) =>
+        set(
+          baseAtom,
+          create(get(baseAtom), (draft) => {
+            draft.items = update(draft.items);
+          })
+        )
+    );
+
+    for (const itemsAtom of [spreadAtom, assignAtom]) {
+      store.set(baseAtom, { items: [1], other: 1 });
+      const baseState = store.get(baseAtom);
+      const { result } = renderHook(() => useSetMutativeAtom(itemsAtom), {
+        wrapper: withStore(store),
+      });
+
+      act(() =>
+        result.current((draft) => {
+          draft.push(2);
+        })
+      );
+
+      expect(store.get(baseAtom)).toEqual({ items: [1, 2], other: 1 });
+      expect(baseState).toEqual({ items: [1], other: 1 });
+    }
+    warn.mockRestore();
   });
 
   test('keeps its setter and applies the latest mutative options', () => {

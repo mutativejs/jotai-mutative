@@ -35,7 +35,7 @@ npm install jotai-mutative@2 mutative@2
 The API is unchanged: the atoms and hooks take the same recipes and the same Mutative options. The changes that can affect an atom are:
 
 - With `enableAutoFreeze: true`, Map and Set instances in the atom value are frozen too, so adding a property to them or replacing one of their methods fails.
-- `useMutativeAtom()` and `useSetMutativeAtom()` change the draft that an atom from `atomWithMutative()` or `withMutative()` passes in place, so the Mutative options of the atom apply instead of those of the hook.
+- `useMutativeAtom()` and `useSetMutativeAtom()` without Mutative options pass the recipe to an atom from `atomWithMutative()` or `withMutative()`, so the Mutative options of the atom apply to it.
 - Mutative selects its development or production build from `process.env.NODE_ENV`. Define it in every bundle, including bundles for Node.js, and in production, match errors by their `Minified Mutative error #<code>` codes instead of their messages.
 - Mutative targets ES2018; transpile it for older engines. Without a bundler, map `mutative` to its production ESM build, `mutative/dist/mutative.esm.production.min.mjs`, as its default ESM build reads `process`, or load its UMD build, which defines the `Mutative` global that the UMD build of `jotai-mutative` reads.
 - The type declarations of Mutative support TypeScript 5.0 and later.
@@ -124,7 +124,7 @@ const Controls = () => {
 ```
 
 > It would be better if you don't use `withMutative` and `atomWithMutative` with `useMutativeAtom` because they provide the mutative-like `writeFunction` and we don't need to create a new one.
-> If you do, the recipe changes the draft that the atom's `writeFunction` passes, so the Mutative options of the atom apply instead of those of the hook.
+> If you do, the hook passes the recipe to the atom's `writeFunction`, so the Mutative options of the atom apply. With Mutative options of its own, the hook creates the next value from the draft that the atom passes, which Mutative 2 reports once in development; set the options on the atom instead.
 > You can use `useSetMutativeAtom` if you need only the setter part of `useMutativeAtom`.
 
 ### Mutative Options
