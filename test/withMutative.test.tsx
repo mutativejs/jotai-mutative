@@ -156,3 +156,61 @@ test('withMutative sets a value on a state that Mutative cannot draft', () => {
 
   expect(store.get(dateAtom)).toBe(date);
 });
+
+test('withMutative derives an atom for each value of its options', () => {
+  const store = createStore();
+  const baseAtom = atom({ count: 0 });
+  const plainAtom = withMutative(baseAtom);
+  const frozenAtom = withMutative(baseAtom, { enableAutoFreeze: true });
+
+  // Equal options, such as inline objects in a render, give the same atom.
+  expect(withMutative(baseAtom)).toBe(plainAtom);
+  expect(withMutative(baseAtom, { strict: undefined })).toBe(plainAtom);
+  expect(withMutative(baseAtom, { enableAutoFreeze: true })).toBe(frozenAtom);
+  expect(frozenAtom).not.toBe(plainAtom);
+
+  store.set(plainAtom, (draft) => {
+    draft.count += 1;
+  });
+  expect(Object.isFrozen(store.get(baseAtom))).toBe(false);
+  store.set(frozenAtom, (draft) => {
+    draft.count += 1;
+  });
+  expect(store.get(baseAtom)).toEqual({ count: 2 });
+  expect(Object.isFrozen(store.get(baseAtom))).toBe(true);
+});
+
+test('withMutative derived atom with inline options in a render', async () => {
+  const regularCountAtom = atom({ value: 0 });
+
+  const Parent = () => {
+    const [count, setCount] = useAtom(
+      withMutative(regularCountAtom, { enableAutoFreeze: true })
+    );
+    return (
+      <>
+        <div>count: {count.value}</div>
+        <button
+          onClick={() =>
+            setCount((draft) => {
+              draft.value += 1;
+            })
+          }
+        >
+          Increase
+        </button>
+      </>
+    );
+  };
+
+  const { findByText, getByText } = render(
+    <StrictMode>
+      <Parent />
+    </StrictMode>
+  );
+
+  await findByText('count: 0');
+
+  fireEvent.click(getByText('Increase'));
+  await findByText('count: 1');
+});
