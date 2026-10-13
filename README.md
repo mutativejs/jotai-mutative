@@ -101,6 +101,7 @@ const Controls = () => {
 ```
 
 > It would be better if you don't use `withMutative` and `atomWithMutative` with `useMutativeAtom` because they provide the mutative-like `writeFunction` and we don't need to create a new one.
+> If you do, the recipe changes the draft that the atom's `writeFunction` passes, so the Mutative options of the atom apply instead of those of the hook.
 > You can use `useSetMutativeAtom` if you need only the setter part of `useMutativeAtom`.
 
 ### Mutative Options

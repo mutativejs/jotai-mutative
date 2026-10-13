@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { create, type Draft } from 'mutative';
+import { create, isDraft, type Draft } from 'mutative';
 import { useSetAtom } from 'jotai/react';
 import type { WritableAtom } from 'jotai/vanilla';
 import type { MutativeOptions } from './interface';
@@ -26,7 +26,15 @@ export function useSetMutativeAtom<Value, Result, F extends boolean = false>(
   const setState = useSetAtom(anAtom, options);
   return useCallback(
     (fn: (draft: Draft<Value>) => void) =>
-      setState(create(fn, mutativeOptions) as () => Value),
+      setState(
+        // The write function of an atom from atomWithMutative() or
+        // withMutative() passes a draft, which the recipe changes in place:
+        // create() would draft a copy of it, current(draft), and warn.
+        ((value: Value) =>
+          isDraft(value)
+            ? fn(value as Draft<Value>)
+            : create(value, fn, mutativeOptions)) as (value: Value) => Value
+      ),
     [setState]
   );
 }

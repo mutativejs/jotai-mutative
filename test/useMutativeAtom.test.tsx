@@ -1,7 +1,15 @@
 import { StrictMode } from 'react';
 import React from 'react';
-import { cleanup, fireEvent, render } from '@testing-library/react';
-import { atom } from 'jotai/vanilla';
+import type { ReactNode } from 'react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  renderHook,
+} from '@testing-library/react';
+import { Provider } from 'jotai/react';
+import { atom, createStore } from 'jotai/vanilla';
 import { atomWithMutative, useMutativeAtom, withMutative } from '../src';
 
 afterEach(cleanup);
@@ -104,4 +112,27 @@ test('useMutativeAtom with derived mutative atom', async () => {
 
   fireEvent.click(getByText('Decrease'));
   await findByText('count: 0');
+});
+
+test('useMutativeAtom changes the draft of a mutative atom in place', () => {
+  const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+  const store = createStore();
+  const stateAtom = atomWithMutative({ count: 0, list: [{ id: 1 }] });
+  const baseState = store.get(stateAtom);
+  const { result } = renderHook(() => useMutativeAtom(stateAtom), {
+    wrapper: ({ children }: { children: ReactNode }) => (
+      <Provider store={store}>{children}</Provider>
+    ),
+  });
+
+  act(() =>
+    result.current[1]((draft) => {
+      draft.count += 1;
+    })
+  );
+
+  expect(result.current[0]).toEqual({ count: 1, list: [{ id: 1 }] });
+  expect(result.current[0].list).toBe(baseState.list);
+  expect(warn).not.toHaveBeenCalled();
+  warn.mockRestore();
 });
