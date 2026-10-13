@@ -11,7 +11,11 @@ export function toRecipe<Value>(
     return fn as (draft: Draft<Value>) => void;
   }
   // The value exists before create() drafts the state, so it holds none of
-  // its drafts, and rawReturn() spares searching it for them. Other values
-  // are returned as they are, as create() never searches them.
-  return () => (typeof fn === 'object' && fn !== null ? rawReturn(fn) : fn);
+  // its drafts, and rawReturn() spares searching it for them. It also sets
+  // undefined, which create() would take as a recipe that returns nothing.
+  // Other values are returned as they are, as create() never searches them.
+  return () =>
+    fn === undefined || (typeof fn === 'object' && fn !== null)
+      ? (rawReturn(fn as object | undefined) as Value)
+      : fn;
 }

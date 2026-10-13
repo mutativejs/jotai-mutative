@@ -132,3 +132,18 @@ test.each([
     warn.mockRestore();
   }
 );
+
+test.each([
+  ['no options', undefined],
+  ['auto-freeze', { enableAutoFreeze: true }],
+] as const)('withMutative sets undefined with %s', (_, options) => {
+  const store = createStore();
+  const stateAtom = withMutative(
+    atom<{ count: number } | undefined>({ count: 0 }),
+    options
+  );
+
+  store.set(stateAtom, undefined);
+
+  expect(store.get(stateAtom)).toBe(undefined);
+});
