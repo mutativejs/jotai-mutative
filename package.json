@@ -88,13 +88,28 @@
     "preset": "ts-jest",
     "testEnvironment": "jsdom",
     "restoreMocks": true,
+    "transform": {
+      "^.+\\.js$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "allowJs": true,
+            "esModuleInterop": true,
+            "target": "es2020"
+          }
+        }
+      ]
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!jotai/)"
+    ],
     "globals": {
       "__DEV__": false
     }
   },
   "peerDependencies": {
     "@types/react": "^18.0 || ^17.0 || ^19.0",
-    "jotai": "^2.0",
+    "jotai": "^2.0 || ^3.0",
     "mutative": "^2.0.0",
     "react": "^17.0 || ^18.0 || ^19.0"
   }

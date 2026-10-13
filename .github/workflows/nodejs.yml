@@ -25,3 +25,27 @@ jobs:
         yarn test:production
       env:
         CI: true
+
+  jotai-v3:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x, 24.x]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: yarn install, build, and test with jotai v3
+      run: |
+        yarn install
+        yarn add --dev jotai@^3
+        yarn build
+        yarn test
+        yarn test:production
+      env:
+        CI: true
