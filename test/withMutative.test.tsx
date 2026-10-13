@@ -147,3 +147,13 @@ test.each([
 
   expect(store.get(stateAtom)).toBe(undefined);
 });
+
+test('withMutative sets a value on a state that Mutative cannot draft', () => {
+  const store = createStore();
+  const dateAtom = withMutative(atom(new Date(0)));
+  const date = new Date(1);
+
+  store.set(dateAtom, date);
+
+  expect(store.get(dateAtom)).toBe(date);
+});

@@ -1,9 +1,9 @@
-import { create, type Draft } from 'mutative';
+import type { Draft } from 'mutative';
 import { atom } from 'jotai/vanilla';
 import type { WritableAtom } from 'jotai/vanilla';
 import type { MutativeOptions } from './interface';
 import { mutativeAtoms } from './mutativeAtoms';
-import { toRecipe } from './toRecipe';
+import { nextValue } from './nextValue';
 
 export function atomWithMutative<Value, F extends boolean = false>(
   initialValue: Value,
@@ -16,7 +16,7 @@ export function atomWithMutative<Value, F extends boolean = false>(
   > = atom(
     initialValue,
     (get, set, fn: Value | ((draft: Draft<Value>) => void)) =>
-      set(anAtom, create(get(anAtom), toRecipe(fn), options) as Value)
+      set(anAtom, nextValue(get(anAtom), fn, options))
   );
   mutativeAtoms.add(anAtom);
   return anAtom;
