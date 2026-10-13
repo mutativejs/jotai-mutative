@@ -3,7 +3,7 @@ import React from 'react';
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import { useAtom } from 'jotai/react';
 import { atomWithDefault, useResetAtom } from 'jotai/utils';
-import { atom } from 'jotai/vanilla';
+import { atom, createStore } from 'jotai/vanilla';
 import { withMutative } from '../src';
 
 afterEach(cleanup);
@@ -108,3 +108,27 @@ test('withMutative derived atom with WritableAtom<Value, [Value | OtherValue]> s
   fireEvent.click(getByText('Reset'));
   await findByText('count: 0');
 });
+
+test.each([
+  ['no options', undefined, false],
+  ['strict mode', { strict: true }, false],
+  ['auto-freeze', { enableAutoFreeze: true }, true],
+] as const)(
+  'withMutative sets an object value as it is with %s',
+  (_, options, frozen) => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = createStore();
+    const stateAtom = withMutative(
+      atom({ count: 0, list: [{ id: 1 }] }),
+      options
+    );
+    const value = { count: 1, list: store.get(stateAtom).list };
+
+    store.set(stateAtom, value);
+
+    expect(store.get(stateAtom)).toBe(value);
+    expect(Object.isFrozen(value)).toBe(frozen);
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  }
+);

@@ -2,6 +2,7 @@ import { create, type Draft } from 'mutative';
 import { atom } from 'jotai/vanilla';
 import type { PrimitiveAtom, WritableAtom } from 'jotai/vanilla';
 import type { MutativeOptions } from './interface';
+import { toRecipe } from './toRecipe';
 
 const cache1 = new WeakMap();
 const memo1 = <T>(create1: () => T, dep1: object): T =>
@@ -40,16 +41,7 @@ export function withMutative<Value, Result, F extends boolean = false>(
     const derivedAtom = atom(
       (get) => get(anAtom),
       (get, set, fn: Value | ((draft: Draft<Value>) => void)) =>
-        set(
-          anAtom,
-          create(
-            get(anAtom),
-            typeof fn === 'function'
-              ? (fn as (draft: Draft<Value>) => void)
-              : () => fn,
-            options
-          ) as Value
-        )
+        set(anAtom, create(get(anAtom), toRecipe(fn), options) as Value)
     );
     return derivedAtom;
   }, anAtom);
