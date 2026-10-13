@@ -142,7 +142,6 @@ describe('useSetMutativeAtom with an object state', () => {
     expect(store.get(stateAtom)).toEqual({ count: 1, list: [{ id: 1 }] });
     expect(store.get(stateAtom).list).toBe(baseState.list);
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 
   test('passes the recipe to a derived mutative atom', () => {
@@ -163,7 +162,6 @@ describe('useSetMutativeAtom with an object state', () => {
     expect(store.get(stateAtom)).toEqual({ count: 1, list: [{ id: 1 }] });
     expect(store.get(stateAtom).list).toBe(baseState.list);
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 
   test('applies its mutative options to a regular atom', () => {
@@ -207,7 +205,7 @@ describe('useSetMutativeAtom with an object state', () => {
 
   test('applies its mutative options to a mutative atom', () => {
     // Mutative warns that create() received a draft of the atom.
-    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
     const store = createStore();
     const stateAtom = atomWithMutative({ count: 0 });
     const { result } = renderHook(
@@ -224,11 +222,11 @@ describe('useSetMutativeAtom with an object state', () => {
 
     expect(store.get(stateAtom)).toEqual({ count: 1 });
     expect(Object.isFrozen(store.get(stateAtom))).toBe(true);
-    warn.mockRestore();
   });
 
   test('gives the next value to atoms that pass it a draft', () => {
-    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    // Mutative warns that create() received a draft of the atom.
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
     const store = createStore();
     const baseAtom = atomWithMutative({ items: [1], other: 1 });
     const spreadAtom = atom(
@@ -263,7 +261,6 @@ describe('useSetMutativeAtom with an object state', () => {
       expect(store.get(baseAtom)).toEqual({ items: [1, 2], other: 1 });
       expect(baseState).toEqual({ items: [1], other: 1 });
     }
-    warn.mockRestore();
   });
 
   test('keeps its setter and applies the latest mutative options', () => {

@@ -87,6 +87,7 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "jsdom",
+    "restoreMocks": true,
     "globals": {
       "__DEV__": false
     }

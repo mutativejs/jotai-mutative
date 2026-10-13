@@ -129,7 +129,6 @@ test.each([
     expect(store.get(stateAtom)).toBe(value);
     expect(Object.isFrozen(value)).toBe(frozen);
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   }
 );
 

@@ -134,5 +134,4 @@ test('useMutativeAtom passes the recipe to a mutative atom', () => {
   expect(result.current[0]).toEqual({ count: 1, list: [{ id: 1 }] });
   expect(result.current[0].list).toBe(baseState.list);
   expect(warn).not.toHaveBeenCalled();
-  warn.mockRestore();
 });
