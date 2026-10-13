@@ -19,6 +19,29 @@ npm install jotai mutative jotai-mutative
 # Or use any package manager of your choice.
 ```
 
+| jotai-mutative | mutative |
+| -------------- | -------- |
+| 2.x            | 2.x      |
+| 1.x            | 1.x      |
+
+### Upgrading to Mutative v2
+
+`jotai-mutative` 2.x declares `mutative` ^2.0.0 as its peer dependency, so upgrade both together:
+
+```bash
+npm install jotai-mutative@2 mutative@2
+```
+
+The API is unchanged: the atoms and hooks take the same recipes and the same Mutative options. The changes that can affect an atom are:
+
+- With `enableAutoFreeze: true`, Map and Set instances in the atom value are frozen too, so adding a property to them or replacing one of their methods fails.
+- `useMutativeAtom()` and `useSetMutativeAtom()` change the draft that an atom from `atomWithMutative()` or `withMutative()` passes in place, so the Mutative options of the atom apply instead of those of the hook.
+- Mutative selects its development or production build from `process.env.NODE_ENV`. Define it in every bundle, including bundles for Node.js, and in production, match errors by their `Minified Mutative error #<code>` codes instead of their messages.
+- Mutative targets ES2018; transpile it for older engines. Without a bundler, map `mutative` to its production ESM build, `mutative/dist/mutative.esm.production.min.mjs`, as its default ESM build reads `process`, or load its UMD build, which defines the `Mutative` global that the UMD build of `jotai-mutative` reads.
+- The type declarations of Mutative support TypeScript 5.0 and later.
+
+See the [migration guide](https://mutative.js.org/docs/advanced-guides/migration-v2/) for every change in Mutative v2.
+
 ## Usage
 
 ### atomWithMutative
