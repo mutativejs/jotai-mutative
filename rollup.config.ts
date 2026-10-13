@@ -5,6 +5,7 @@ import terser from '@rollup/plugin-terser';
 import pkg from './package.json';
 
 const input = './dist/index.js';
+const externals = ['mutative', 'jotai', 'react'];
 
 export default {
   input,
@@ -30,7 +31,8 @@ export default {
       sourcemap: true,
       globals: {
         mutative: 'Mutative',
-        jotai: 'Jotai',
+        'jotai/vanilla': 'jotaiVanilla',
+        'jotai/react': 'jotaiReact',
         react: 'React',
       },
       exports: 'named',
@@ -45,5 +47,6 @@ export default {
     }),
     terser(),
   ],
-  external: ['mutative', 'jotai', 'react'],
+  external: (id) =>
+    externals.some((name) => id === name || id.startsWith(`${name}/`)),
 };
