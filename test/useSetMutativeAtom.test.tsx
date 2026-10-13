@@ -204,21 +204,25 @@ describe('useSetMutativeAtom with an object state', () => {
     expect(Object.isFrozen(store.get(stateAtom))).toBe(true);
   });
 
-  test('applies the latest mutative options', () => {
+  test('keeps its setter and applies the latest mutative options', () => {
     const store = createStore();
     const stateAtom = atom({ count: 0 });
     const { result, rerender } = renderHook(
       ({ enableAutoFreeze }: { enableAutoFreeze: boolean }) =>
-        useSetMutativeAtom(stateAtom, undefined, { enableAutoFreeze }),
+        useSetMutativeAtom(stateAtom, undefined, {
+          enableAutoFreeze,
+          mark: () => undefined,
+        }),
       { initialProps: { enableAutoFreeze: false }, wrapper: withStore(store) }
     );
     const setState = result.current;
 
-    // Equal options, such as an inline object, keep the setter.
+    // Inline options, a new mark included, keep the setter.
     rerender({ enableAutoFreeze: false });
     expect(result.current).toBe(setState);
 
     rerender({ enableAutoFreeze: true });
+    expect(result.current).toBe(setState);
     act(() =>
       result.current((draft) => {
         draft.count += 1;
