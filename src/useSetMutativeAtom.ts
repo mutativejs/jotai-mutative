@@ -21,9 +21,12 @@ export function useSetMutativeAtom<Value, Result, F extends boolean = false>(
 export function useSetMutativeAtom<Value, Result, F extends boolean = false>(
   anAtom: WritableAtom<Value, [(value: Value) => Value], Result>,
   options?: Options,
-  mutativeOptions?: MutativeOptions<false, F>
+  mutativeOptions: MutativeOptions<false, F> = {}
 ) {
   const setState = useSetAtom(anAtom, options);
+  // The setter depends on the option values, so that equal options, such as
+  // an inline object, keep it, and changed options take effect.
+  const { strict, enableAutoFreeze, mark } = mutativeOptions;
   return useCallback(
     (fn: (draft: Draft<Value>) => void) =>
       setState(
@@ -33,8 +36,10 @@ export function useSetMutativeAtom<Value, Result, F extends boolean = false>(
         ((value: Value) =>
           isDraft(value)
             ? fn(value as Draft<Value>)
-            : create(value, fn, mutativeOptions)) as (value: Value) => Value
+            : create(value, fn, { strict, enableAutoFreeze, mark })) as (
+          value: Value
+        ) => Value
       ),
-    [setState]
+    [setState, strict, enableAutoFreeze, mark]
   );
 }
