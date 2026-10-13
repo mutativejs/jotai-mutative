@@ -19,10 +19,12 @@ npm install jotai mutative jotai-mutative
 # Or use any package manager of your choice.
 ```
 
-| jotai-mutative | mutative |
-| -------------- | -------- |
-| 2.x            | 2.x      |
-| 1.x            | 1.x      |
+| jotai-mutative | mutative | jotai    |
+| -------------- | -------- | -------- |
+| 2.x            | 2.x      | 2.x, 3.x |
+| 1.x            | 1.x      | 2.x      |
+
+Jotai 3 needs React 18 or later, so stay on Jotai 2 with React 17. Jotai 3 has no UMD build, so the UMD build of `jotai-mutative`, which reads the `jotaiVanilla` and `jotaiReact` globals of the UMD builds of Jotai 2, works only with Jotai 2. See the [Jotai v3 migration guide](https://jotai.org/docs/guides/migrating-to-v3) for the other changes in Jotai 3.
 
 ### Upgrading to Mutative v2
 
